@@ -42,14 +42,11 @@ with open(args.filename[0]) as ipf:
 pdtable = pd.DataFrame(data,columns = ['detno','energy','YCal','YExp','diff_per','diff_sig'])
 
 #find out how many energy points are used
-energies = []
+grp = pdtable.groupby('energy').groups
 
-for energy in pdtable['energy']:
-    if energy not in energies:
-        energies.append(energy)
 drawenergy = []
 if not args.energy:
-    drawenergy = energies
+    drawenergy = list(grp.keys())
 else:
     drawenergy = args.energy
 
@@ -67,7 +64,8 @@ for i in range(nfig):
 for i, energy in enumerate(drawenergy):
 #    pdt1 = pdtable[pdtable['energy']==energy ]
 #    pdt1 = pdt1[pdt1['detno']!=1]
-    pdt1 = pdtable[ (pdtable.energy == energy) & (pdtable.detno != 1)]
+    pdt1 = pdtable.loc[ grp[energy] ]
+    pdt1 = pdt1[pdt1.detno!=1] # get rid of detno1
     ax1 = pdt1.plot('detno','YCal', kind='scatter',label='YCal',title=str(energy),ax=axeslst[i//6][np.unravel_index(i%6,axes.shape)],sharex=axeslst[0][0,0])
     ax2 = pdt1.plot('detno','YExp', kind='scatter',label='YExp',ax = ax1,color='r',marker='x')
     ax1.ticklabel_format(style='sci',axis='y',scilimits=(0,0))
