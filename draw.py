@@ -29,12 +29,16 @@ with open(args.filename[0]) as ipf:
                     break
                 ldata = []
                 ldata.append(mo.group())
-                ldata+=str1.split()[4:9]
+                str1 = str1.split()
+                if str1[-1] == '*?!*' :
+                    str1.pop(-1)
+                ldata+=str1[-5:]
                 for i,j in enumerate(ldata):
                     try:
                         ldata[i] = float(j)
                     except:
-                        ldata[i] = 0.0
+                        print(ldata[i].split('+'))
+                        ldata[i] = float(ldata[i].split('+')[0])
                 data.append(ldata)
 
 # sort the data according the energy and position
@@ -48,7 +52,11 @@ drawenergy = []
 if not args.energy:
     drawenergy = list(grp.keys())
 else:
-    drawenergy = args.energy
+    for e in args.energy:
+        if e in grp.keys():
+            drawenergy.append(e)
+        else:
+            print("{} not in the table".format(e))
 
 drawenergy.sort()
 ncol = 3
